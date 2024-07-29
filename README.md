@@ -1,9 +1,11 @@
-# STAR WARS characters library app
+# STAR WARS characters library app [[live_application]](https://react-graphql-list-app.vercel.app/) ![Test workflow](https://github.com/andriiholovan/react-graphql-list-app/actions/workflows/playwright.yml/badge.svg)
+[![Main screen of the application](main_screen.png)](https://react-graphql-list-app.vercel.app/)
 
 - Styles: [Tailwind](https://tailwindcss.com/) + [NextUI](https://nextui.org/) (accessibility ready)
 - Router: [@tanstack/react-router](https://tanstack.com/router/latest) file based routing
 - Data fetching: [@tanstack/react-query](https://tanstack.com/query/latest) + GraphQL client [graphql-request](https://github.com/jasonkuhrt/graphql-request)
-- Testing: [Vitest](https://vitest.dev/)
+- Unit testing: [Vitest](https://vitest.dev/)
+- e2e testing: [Playwright](https://playwright.dev/)
 
 ## Getting Started
 
@@ -31,7 +33,9 @@ npm run test
 - [x] [general] Implement general app functionality based on tech stack above: routing/graphQL client/query caching/testing
 - [x] [experiments] In /people and /people/$peopleId routes used different @tanstack/query + @tanstack/router methods to retrieve data from cache
 - [x] [reliability] Add zod to validate data from API in runtime
+- [x] [deploy] Run hosted project
 - [x] [testing] Add playwright e2e tests to verify app routing behavior
+- [x] [CI] add GitHub CI for e2e testing
 - [ ] [performance] add Zustand for state management
 - [ ] [testing] Add unit tests for hooks
 - [ ] [performance] Improve requests caching
