@@ -1,30 +1,41 @@
-# React + TypeScript + Vite
+# STAR WARS characters library app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- Styles: [Tailwind](https://tailwindcss.com/) + [NextUI](https://nextui.org/) (accessibility ready)
+- Router: [@tanstack/react-router](https://tanstack.com/router/latest) file based routing
+- Data fetching: [@tanstack/react-query](https://tanstack.com/query/latest) + GraphQL client [graphql-request](https://github.com/jasonkuhrt/graphql-request)
+- Testing: [Vitest](https://vitest.dev/)
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+First, run the development server:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Dev server is running on http://localhost:3001/
+
+## Tests
+
+```bash
+npm run test
+```
+
+### ROADMAP
+- [x] [experiments] In /people and /people/$peopleId routes used different @tanstack/query + @tanstack/router methods to retrieve data from cache
+- [ ] [performance] Improve requests caching
+- [ ] [UX] Improve error handling for some cases
+- [ ] [performance] Fetch data dynamically (per_page)
+- [ ] [UX] Improve pages loading states, replace default spinners with skeleton pattern
+- [ ] [UI] Improve responsiveness for screens lower than 576px
+- [ ] [performance] Add code-splitting
+
+### KNOWN ISSUES
+
+- [ ] [UI] Pagination shift on the last page

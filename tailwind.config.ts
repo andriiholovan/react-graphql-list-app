@@ -1,19 +1,19 @@
+import { nextui } from '@nextui-org/react';
 import type { Config } from 'tailwindcss';
 
 export default {
   content: [
     './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)'],
       },
     },
   },
-  plugins: [],
+  plugins: [nextui()],
   future: {
     hoverOnlyWhenSupported: true,
   },
