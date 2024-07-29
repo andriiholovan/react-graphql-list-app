@@ -123,6 +123,7 @@ export default function PeopleComponent() {
   const bottomContent = useMemo(() => (
     <div className="py-2 px-2 flex justify-center items-center">
       <Pagination
+        data-testid="pagination_group"
         className="justify-center"
         color="primary"
         page={page}
@@ -136,6 +137,7 @@ export default function PeopleComponent() {
 
   return (
     <Table
+      data-testid="main_table"
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
       isStriped
@@ -180,6 +182,7 @@ export default function PeopleComponent() {
                             personId: item.id,
                           }}
                           className="h-full flex w-full justify-center items-center"
+                          data-testid="more_details_button"
                         >
                           See more
                         </Link>
