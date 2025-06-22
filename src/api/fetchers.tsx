@@ -6,7 +6,7 @@ import { PeopleSchema, PersonSchema } from './schema';
 // todo: implement pagination based on graphQL requests
 // const PER_PAGE = 10;
 
-const BASE_URI = 'https://swapi-graphql.netlify.app/.netlify/functions/index';
+const BASE_URI = 'https://swapi-graphql.eskerda.vercel.app';
 const client = new GraphQLClient(BASE_URI);
 
 export class PersonNotFoundError extends Error {}
