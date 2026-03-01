@@ -1,7 +1,7 @@
 import { NextUIProvider } from '@nextui-org/react';
-import ReactDOM from 'react-dom/client';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createRouter, RouterProvider } from '@tanstack/react-router';
+import ReactDOM from 'react-dom/client';
 
 import { routeTree } from './routeTree.gen';
 import './index.css';
@@ -19,7 +19,8 @@ export const router = createRouter({
   defaultPreloadStaleTime: 0,
 });
 
-const rootElement = document.getElementById('root')!;
+const rootElement = document.getElementById('root') as HTMLElement;
+
 ReactDOM.createRoot(rootElement).render(
   <QueryClientProvider client={queryClient}>
     <NextUIProvider>

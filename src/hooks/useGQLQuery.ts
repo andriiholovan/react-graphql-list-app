@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-type KeyType = string[] | [string, { [key: string] : unknown }];
+type KeyType = string[] | [string, { [key: string]: unknown }];
 
 export function useGQLQuery<APIResponse>(
   key: KeyType,

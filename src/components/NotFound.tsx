@@ -3,14 +3,14 @@ import { Link } from '@tanstack/react-router';
 
 export default function NotFound() {
   return (
-    <div className="h-screen flex flex-col justify-center items-center content-center">
-      <h2 className="mb-2 text-xl" data-testid="not_found_heading">
+    <div className="flex h-screen flex-col content-center items-center justify-center">
+      <h2 className="mb-4 text-xl" data-testid="not_found_heading">
         Page not found
       </h2>
       <Button color="danger">
         <Link
           to="/"
-          className="h-full flex w-full justify-center items-center"
+          className="flex h-full w-full items-center justify-center"
           data-testid="start_over_link"
         >
           Start Over

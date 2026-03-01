@@ -1,5 +1,5 @@
-import { gql, GraphQLClient } from 'graphql-request';
-import z from 'zod';
+import { GraphQLClient, gql } from 'graphql-request';
+import type z from 'zod';
 
 import { PeopleSchema, PersonSchema } from './schema';
 
@@ -13,7 +13,9 @@ export class PersonNotFoundError extends Error {}
 
 export async function fetchAllPeople() {
   // I'm using zod to validate endpoint response in the runtime
-  const data = await client.request<{ allPeople: z.infer<typeof PeopleSchema> }>(
+  const data = await client.request<{
+    allPeople: z.infer<typeof PeopleSchema>;
+  }>(
     gql`
       query AllPeople {
         allPeople {
@@ -46,7 +48,9 @@ export async function fetchAllPeople() {
 
 export async function fetchPersonByID(personId: string) {
   // I'm using zod to validate endpoint response in the runtime
-  const { person } = await client.request<{ person: z.infer<typeof PersonSchema> }>(
+  const { person } = await client.request<{
+    person: z.infer<typeof PersonSchema>;
+  }>(
     gql`
       query Person($personId: ID!) {
         person(id: $personId) {

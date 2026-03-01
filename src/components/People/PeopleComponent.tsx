@@ -1,20 +1,21 @@
-import { useCallback, useMemo, useState } from 'react';
 import {
   Button,
   Input,
   Pagination,
-  SortDescriptor,
+  type SortDescriptor,
   Table,
-  TableBody, TableCell,
+  TableBody,
+  TableCell,
   TableColumn,
   TableHeader,
   TableRow,
 } from '@nextui-org/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
+import { useCallback, useMemo, useState } from 'react';
 
 import { peopleQueryOptions } from '../../api/queryOptions';
-import { PersonType } from '../../api/schema';
+import type { PersonType } from '../../api/schema';
 import { SearchIcon } from '../SearchIcon';
 import { columns } from './constants';
 
@@ -34,12 +35,12 @@ export default function PeopleComponent() {
     let filteredUsers = [...people];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter(
-        (user) => user.name.toLowerCase().includes(filterValue.toLowerCase()),
+      filteredUsers = filteredUsers.filter((user) =>
+        user.name.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     return filteredUsers;
-  }, [people, filterValue]);
+  }, [people, filterValue, hasSearchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -50,18 +51,25 @@ export default function PeopleComponent() {
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
 
-  const sortedItems = useMemo(() => [...items].sort((a: PersonType, b: PersonType) => {
-    const first = a[sortDescriptor.column as keyof PersonType] as number;
-    const second = b[sortDescriptor.column as keyof PersonType] as number;
-    const cmp = first < second ? -1 : first > second ? 1 : 0;
+  const sortedItems = useMemo(
+    () =>
+      [...items].sort((a: PersonType, b: PersonType) => {
+        const first = a[sortDescriptor.column as keyof PersonType] as number;
+        const second = b[sortDescriptor.column as keyof PersonType] as number;
+        const cmp = first < second ? -1 : first > second ? 1 : 0;
 
-    return sortDescriptor.direction === 'descending' ? -cmp : cmp;
-  }), [sortDescriptor, items]);
+        return sortDescriptor.direction === 'descending' ? -cmp : cmp;
+      }),
+    [sortDescriptor, items],
+  );
 
-  const onRowsPerPageChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
+  const onRowsPerPageChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    },
+    [],
+  );
 
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
@@ -77,63 +85,62 @@ export default function PeopleComponent() {
     setPage(1);
   }, []);
 
-  const topContent = useMemo(() => (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-between gap-3 items-end">
-        <Input
-          isClearable
-          className="w-full"
-          placeholder="Search by name..."
-          startContent={<SearchIcon />}
-          value={filterValue}
-          onClear={() => onClear()}
-          onValueChange={onSearchChange}
+  const topContent = useMemo(
+    () => (
+      <div className="flex flex-col gap-4">
+        <div className="flex items-end justify-between gap-3">
+          <Input
+            isClearable
+            className="w-full"
+            placeholder="Search by name..."
+            startContent={<SearchIcon />}
+            value={filterValue}
+            onClear={onClear}
+            onValueChange={onSearchChange}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-default-400 text-small">
+            Total {people.length} people
+          </span>
+          <label
+            className="flex items-center text-default-400 text-small"
+            htmlFor="rows-select"
+          >
+            Rows per page:
+            <select
+              className="bg-transparent text-default-400 text-small outline-none"
+              id="rows-select"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    ),
+    [filterValue, onClear, onSearchChange, onRowsPerPageChange, people.length],
+  );
+
+  const bottomContent = useMemo(
+    () => (
+      <div className="flex items-center justify-center px-2 py-2">
+        <Pagination
+          data-testid="pagination_group"
+          className="justify-center"
+          color="primary"
+          page={page}
+          total={pages}
+          onChange={setPage}
+          showShadow={!!filteredItems.length}
+          showControls={!!filteredItems.length}
         />
       </div>
-      <div className="flex justify-between items-center">
-        <span className="text-default-400 text-small">
-          Total
-          {' '}
-          {people.length}
-          {' '}
-          people
-        </span>
-        <label className="flex items-center text-default-400 text-small" htmlFor="rows-select">
-          Rows per page:
-          <select
-            className="bg-transparent outline-none text-default-400 text-small"
-            id="rows-select"
-            onChange={onRowsPerPageChange}
-          >
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20">20</option>
-          </select>
-        </label>
-      </div>
-    </div>
-  ), [
-    filterValue,
-    onSearchChange,
-    onRowsPerPageChange,
-    people.length,
-    hasSearchFilter,
-  ]);
-
-  const bottomContent = useMemo(() => (
-    <div className="py-2 px-2 flex justify-center items-center">
-      <Pagination
-        data-testid="pagination_group"
-        className="justify-center"
-        color="primary"
-        page={page}
-        total={pages}
-        onChange={setPage}
-        showShadow={!!filteredItems.length}
-        showControls={!!filteredItems.length}
-      />
-    </div>
-  ), [page, pages, sortedItems.length, filteredItems.length]);
+    ),
+    [page, pages, filteredItems.length],
+  );
 
   return (
     <Table
@@ -144,12 +151,12 @@ export default function PeopleComponent() {
       bottomContent={bottomContent}
       bottomContentPlacement="outside"
       classNames={{
-        base: 'py-4 px-4 min-h-full',
-        wrapper: 'max-h-[382px]',
+        base: 'h-dvh px-4 py-4',
+        wrapper: 'h-full min-h-96',
       }}
-      layout="fixed"
       sortDescriptor={sortDescriptor}
       topContent={topContent}
+      topContentPlacement="outside"
       onSortChange={setSortDescriptor}
     >
       <TableHeader columns={columns}>
@@ -163,32 +170,29 @@ export default function PeopleComponent() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody
-        emptyContent="No people found"
-        items={sortedItems}
-      >
+      <TableBody emptyContent="No people found" items={sortedItems}>
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => {
               const renderedValue = item[columnKey as keyof PersonType];
               return (
                 <TableCell>
-                  {columnKey === 'details'
-                    ? (
-                      <Button>
-                        <Link
-                          to="/people/$personId"
-                          params={{
-                            personId: item.id,
-                          }}
-                          className="h-full flex w-full justify-center items-center"
-                          data-testid="more_details_button"
-                        >
-                          See more
-                        </Link>
-                      </Button>
-                    )
-                    : renderedValue}
+                  {columnKey === 'details' ? (
+                    <Button>
+                      <Link
+                        to="/people/$personId"
+                        params={{
+                          personId: item.id,
+                        }}
+                        className="flex h-full w-full items-center justify-center"
+                        data-testid="more_details_button"
+                      >
+                        See more
+                      </Link>
+                    </Button>
+                  ) : (
+                    renderedValue
+                  )}
                 </TableCell>
               );
             }}

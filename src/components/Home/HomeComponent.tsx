@@ -1,14 +1,18 @@
 import { Button } from '@nextui-org/react';
 import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
 
 export default function HomeComponent() {
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
     <div className="p-2">
-      <div className="h-screen flex flex-col justify-center items-center content-center">
-        <Button color="primary">
+      <div className="flex h-screen flex-col content-center items-center justify-center">
+        <Button color="primary" isLoading={isLoading}>
           <Link
+            onClick={() => setIsLoading(true)}
             to="/people"
-            className="h-full flex w-full justify-center items-center"
+            className="flex h-full w-full items-center justify-center"
             data-testid="home_start_button"
           >
             Jump to Star Wars characters list
