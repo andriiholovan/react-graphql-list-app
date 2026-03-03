@@ -14,23 +14,23 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useCallback, useMemo, useState } from 'react';
 
-import { peopleQueryOptions } from '../../api/queryOptions';
-import type { PersonType } from '../../api/schema';
-import { SearchIcon } from '../SearchIcon';
+import { type PersonType, peopleQuery } from '../../api';
+import { SearchIcon } from '../search-icon';
 import { columns } from './constants';
 
-export default function PeopleComponent() {
-  const [filterValue, setFilterValue] = useState('');
+export function People() {
+  const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filterValue, setFilterValue] = useState('');
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'age',
     direction: 'ascending',
   });
-  const [page, setPage] = useState(1);
   const hasSearchFilter = Boolean(filterValue);
 
-  const { data } = useSuspenseQuery(peopleQueryOptions);
+  const { data } = useSuspenseQuery(peopleQuery);
   const { people } = data;
+
   const filteredItems = useMemo(() => {
     let filteredUsers = [...people];
 

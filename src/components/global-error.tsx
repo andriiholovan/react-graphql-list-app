@@ -8,9 +8,7 @@ import {
 } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-export default function GlobalError({
-  error,
-}: Omit<ErrorComponentProps, 'reset'>) {
+export function GlobalError({ error }: Omit<ErrorComponentProps, 'reset'>) {
   const router = useRouter();
   const queryErrorResetBoundary = useQueryErrorResetBoundary();
 

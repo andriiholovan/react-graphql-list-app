@@ -9,8 +9,6 @@ import { PeopleSchema, PersonSchema } from './schema';
 const BASE_URI = 'https://swapi-graphql.eskerda.vercel.app';
 const client = new GraphQLClient(BASE_URI);
 
-export class PersonNotFoundError extends Error {}
-
 export async function fetchAllPeople() {
   // I'm using zod to validate endpoint response in the runtime
   const data = await client.request<{

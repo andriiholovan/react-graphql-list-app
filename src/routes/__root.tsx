@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
 
-import NotFound from '../components/NotFound';
+import { NotFound } from '../components';
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === 'production'

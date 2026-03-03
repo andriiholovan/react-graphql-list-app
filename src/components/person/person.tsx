@@ -10,14 +10,14 @@ import {
 import { Link, useParams } from '@tanstack/react-router';
 
 import { usePersonQuery } from '../../hooks/usePersonQuery';
-import GlobalError from '../GlobalError';
-import PersonPendingComponent from './PersonPendingComponent';
+import { GlobalError } from '../global-error';
+import { PersonLoader } from './person-loader';
 
-export default function PersonComponent() {
+export function Person() {
   const { personId } = useParams({ from: '/people/$personId' });
   const { data, isLoading, error } = usePersonQuery(personId);
 
-  if (isLoading) return <PersonPendingComponent />;
+  if (isLoading) return <PersonLoader />;
   if (error) return <GlobalError error={error} />;
 
   return (

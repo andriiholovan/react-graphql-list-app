@@ -2,7 +2,7 @@ import { Button } from '@nextui-org/react';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
-export default function HomeComponent() {
+export function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   return (

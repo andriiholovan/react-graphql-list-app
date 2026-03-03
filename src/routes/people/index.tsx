@@ -1,16 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { peopleQueryOptions } from '../../api/queryOptions';
-import NotFound from '../../components/NotFound';
-import {
-  PeopleComponent,
-  PeoplePendingComponent,
-} from '../../components/People';
+import { peopleQuery } from '../../api';
+import { NotFound, People, PeopleSkeleton } from '../../components';
 
 export const Route = createFileRoute('/people/')({
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(peopleQueryOptions),
-  pendingComponent: PeoplePendingComponent,
+    queryClient.ensureQueryData(peopleQuery),
+  pendingComponent: PeopleSkeleton,
   notFoundComponent: NotFound,
-  component: PeopleComponent,
+  component: People,
 });

@@ -1,5 +1,4 @@
-import { fetchPersonByID } from '../api/fetchers';
-import type { PersonType } from '../api/schema';
+import { fetchPersonByID, type PersonType } from '../api';
 import { useGQLQuery } from './useGQLQuery';
 
 export function usePersonQuery(personId: string) {
