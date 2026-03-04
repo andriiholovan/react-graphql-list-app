@@ -1,4 +1,4 @@
-import { NextUIProvider } from '@nextui-org/react';
+import { HeroUIProvider } from '@heroui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import ReactDOM from 'react-dom/client';
@@ -23,8 +23,8 @@ const rootElement = document.getElementById('root') as HTMLElement;
 
 ReactDOM.createRoot(rootElement).render(
   <QueryClientProvider client={queryClient}>
-    <NextUIProvider>
+    <HeroUIProvider>
       <RouterProvider router={router} />
-    </NextUIProvider>
+    </HeroUIProvider>
   </QueryClientProvider>,
 );

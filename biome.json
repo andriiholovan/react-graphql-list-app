@@ -25,14 +25,6 @@
         "noUnresolvedImports": "off",
         "useImportExtensions": "off"
       },
-      "suspicious": {
-        "noUnknownAtRules": {
-          "level": "error",
-          "options": {
-            "ignore": ["tailwind"]
-          }
-        }
-      },
       "nursery": {
         "useSortedClasses": {
           "level": "warn",

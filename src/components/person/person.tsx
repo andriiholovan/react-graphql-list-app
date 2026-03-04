@@ -6,7 +6,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from '@nextui-org/react';
+} from '@heroui/react';
 import { Link, useParams } from '@tanstack/react-router';
 
 import { usePersonQuery } from '../../hooks/usePersonQuery';

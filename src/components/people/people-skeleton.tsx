@@ -1,4 +1,4 @@
-import { Card, Skeleton } from '@nextui-org/react';
+import { Card, Skeleton } from '@heroui/react';
 
 const SKELETON_ELEMENTS_MAPPER = [...Array(10)].map(() => Math.random() * 10);
 
