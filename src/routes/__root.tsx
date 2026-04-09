@@ -1,18 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
-import { lazy, Suspense } from 'react';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 import { NotFound } from '../components';
-
-const TanStackRouterDevtools =
-  process.env.NODE_ENV === 'production'
-    ? () => null // Render nothing in production
-    : lazy(() =>
-        import('@tanstack/router-devtools').then((res) => ({
-          default: res.TanStackRouterDevtools,
-        })),
-      );
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -26,9 +17,7 @@ function RootComponent() {
     <>
       <Outlet />
       <ReactQueryDevtools buttonPosition="top-right" />
-      <Suspense>
-        <TanStackRouterDevtools position="bottom-right" />
-      </Suspense>
+      <TanStackRouterDevtools position="bottom-right" />
     </>
   );
 }
