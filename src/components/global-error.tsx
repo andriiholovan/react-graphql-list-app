@@ -21,10 +21,10 @@ export function GlobalError({ error }: Omit<ErrorComponentProps, 'reset'>) {
   };
 
   return (
-    <div className="flex h-screen flex-col content-center items-center justify-center">
-      <h2 className="mb-2 text-xl">Something went wrong</h2>
+    <div className="flex h-screen flex-col content-center items-center justify-center gap-2">
+      <ErrorComponent error={error} />
       <div className="flex gap-2">
-        <Button color="danger" onClick={invalidateRoute}>
+        <Button color="danger" onPress={invalidateRoute}>
           Retry
         </Button>
         <Button color="primary">
@@ -36,7 +36,6 @@ export function GlobalError({ error }: Omit<ErrorComponentProps, 'reset'>) {
           </Link>
         </Button>
       </div>
-      <ErrorComponent error={error} />
     </div>
   );
 }

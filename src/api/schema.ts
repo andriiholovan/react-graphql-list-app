@@ -1,24 +1,18 @@
 import z from 'zod';
 
 export const PersonSchema = z.object({
-  birthYear: z.string(),
-  eyeColor: z.string(),
-  hairColor: z.string(),
-  height: z.union([z.number(), z.null()]),
+  birthYear: z.string().nullable(),
+  eyeColor: z.string().nullable(),
+  hairColor: z.string().nullable(),
+  height: z.number().nullable(),
   id: z.string(),
   name: z.string(),
-  gender: z.string(),
+  gender: z.string().nullable(),
   mass: z.number().nullable(),
 });
 
 export const PeopleSchema = z.object({
   people: z.array(PersonSchema),
-  pageInfo: z.object({
-    endCursor: z.string(),
-    hasNextPage: z.boolean(),
-    hasPreviousPage: z.boolean(),
-    startCursor: z.string(),
-  }),
   totalCount: z.number(),
 });
 

@@ -11,7 +11,8 @@ export function Home() {
         <Button color="primary" isLoading={isLoading}>
           <Link
             onClick={() => setIsLoading(true)}
-            to="/people"
+            to="/people/$page"
+            params={{ page: '1' }}
             className="flex h-full w-full items-center justify-center"
             data-testid="home_start_button"
           >

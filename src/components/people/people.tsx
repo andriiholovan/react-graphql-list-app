@@ -1,8 +1,9 @@
 import {
-  Button,
+  cn,
   Input,
   Pagination,
   type SortDescriptor,
+  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -10,80 +11,94 @@ import {
   TableHeader,
   TableRow,
 } from '@heroui/react';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useNavigate, useParams } from '@tanstack/react-router';
+import { type Key, useCallback, useMemo, useState } from 'react';
 
-import { type PersonType, peopleQuery } from '../../api';
+import type { PersonType } from '../../api';
+import { usePeopleQuery } from '../../hooks';
 import { SearchIcon } from '../search-icon';
 import { columns } from './constants';
 
 export function People() {
-  const [page, setPage] = useState(1);
+  const { page } = useParams({ from: '/people/$page' });
+  const navigate = useNavigate();
+
+  const pageNumber = Number.isNaN(Number(page)) ? 1 : Number(page);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filterValue, setFilterValue] = useState('');
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: 'age',
+    column: 'name',
     direction: 'ascending',
   });
-  const hasSearchFilter = Boolean(filterValue);
 
-  const { data } = useSuspenseQuery(peopleQuery);
-  const { people } = data;
+  const offset = (pageNumber - 1) * rowsPerPage;
+
+  const { data, isFetching } = usePeopleQuery(offset, rowsPerPage);
+
+  const people = isFetching ? [] : (data?.people ?? []);
+  const pages = data ? Math.ceil(data.totalCount / rowsPerPage) : 0;
 
   const filteredItems = useMemo(() => {
-    let filteredUsers = [...people];
+    if (!filterValue) return people;
 
-    if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase()),
-      );
-    }
-    return filteredUsers;
-  }, [people, filterValue, hasSearchFilter]);
-
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
-
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
+    return people.filter((user) =>
+      user.name.toLowerCase().includes(filterValue.toLowerCase()),
+    );
+  }, [people, filterValue]);
 
   const sortedItems = useMemo(
     () =>
-      [...items].sort((a: PersonType, b: PersonType) => {
-        const first = a[sortDescriptor.column as keyof PersonType] as number;
-        const second = b[sortDescriptor.column as keyof PersonType] as number;
+      filteredItems.toSorted((a, b) => {
+        const first = a[sortDescriptor.column as keyof PersonType];
+        const second = b[sortDescriptor.column as keyof PersonType];
+
+        if (first === null || first === undefined) return 1;
+        if (second === null || second === undefined) return -1;
+
         const cmp = first < second ? -1 : first > second ? 1 : 0;
 
         return sortDescriptor.direction === 'descending' ? -cmp : cmp;
       }),
-    [sortDescriptor, items],
+    [sortDescriptor, filteredItems],
   );
+
+  const goToFirstPage = useCallback(() => {
+    navigate({ to: '/people/$page', params: { page: '1' } });
+  }, [navigate]);
 
   const onRowsPerPageChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setRowsPerPage(Number(e.target.value));
-      setPage(1);
+      goToFirstPage();
     },
-    [],
+    [goToFirstPage],
   );
 
-  const onSearchChange = useCallback((value?: string) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue('');
-    }
-  }, []);
+  const onSearchChange = useCallback(
+    (value?: string) => {
+      setFilterValue(value || '');
+      goToFirstPage();
+    },
+    [goToFirstPage],
+  );
 
-  const onClear = useCallback(() => {
+  const onSearchClear = useCallback(() => {
     setFilterValue('');
-    setPage(1);
-  }, []);
+    goToFirstPage();
+  }, [goToFirstPage]);
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      navigate({ to: '/people/$page', params: { page: String(newPage) } });
+    },
+    [navigate],
+  );
+
+  const onRowAction = (key: Key) =>
+    navigate({
+      to: '/person/$personId',
+      params: { personId: key as string },
+    });
 
   const topContent = useMemo(
     () => (
@@ -95,21 +110,24 @@ export function People() {
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
-            onClear={onClear}
+            onClear={onSearchClear}
             onValueChange={onSearchChange}
           />
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-default-400 text-small">
-            Total {people.length} people
-          </span>
+          {data?.totalCount ? (
+            <span className="text-default-400 text-small">
+              Total {data.totalCount} people
+            </span>
+          ) : null}
+
           <label
-            className="flex items-center text-default-400 text-small"
+            className="ml-auto flex items-center text-default-400 text-small"
             htmlFor="rows-select"
           >
             Rows per page:
             <select
-              className="bg-transparent text-default-400 text-small outline-none"
+              className="cursor-pointer bg-transparent text-default-400 text-small outline-none"
               id="rows-select"
               onChange={onRowsPerPageChange}
             >
@@ -121,7 +139,13 @@ export function People() {
         </div>
       </div>
     ),
-    [filterValue, onClear, onSearchChange, onRowsPerPageChange, people.length],
+    [
+      filterValue,
+      onSearchClear,
+      onSearchChange,
+      onRowsPerPageChange,
+      data?.totalCount,
+    ],
   );
 
   const bottomContent = useMemo(
@@ -129,17 +153,17 @@ export function People() {
       <div className="flex items-center justify-center px-2 py-2">
         <Pagination
           data-testid="pagination_group"
-          className="justify-center"
+          classNames={{ item: 'cursor-pointer' }}
           color="primary"
-          page={page}
+          page={pageNumber}
           total={pages}
-          onChange={setPage}
+          onChange={handlePageChange}
           showShadow={!!filteredItems.length}
           showControls={!!filteredItems.length}
         />
       </div>
     ),
-    [page, pages, filteredItems.length],
+    [pageNumber, pages, filteredItems.length, handlePageChange],
   );
 
   return (
@@ -153,11 +177,17 @@ export function People() {
       classNames={{
         base: 'h-dvh px-4 py-4',
         wrapper: 'h-full min-h-96',
+        table: cn(
+          sortedItems.length >= rowsPerPage && !isFetching && 'h-full',
+          '[border-collapse:separate] [border-spacing:0_4px]',
+        ),
+        tr: 'cursor-pointer',
       }}
+      onRowAction={onRowAction}
+      onSortChange={setSortDescriptor}
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"
-      onSortChange={setSortDescriptor}
     >
       <TableHeader columns={columns}>
         {(column) => (
@@ -170,32 +200,19 @@ export function People() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent="No people found" items={sortedItems}>
+      <TableBody
+        items={sortedItems}
+        isLoading={isFetching}
+        emptyContent="No people found"
+        loadingContent={<Spinner label="Loading..." />}
+      >
         {(item) => (
           <TableRow key={item.id}>
-            {(columnKey) => {
-              const renderedValue = item[columnKey as keyof PersonType];
-              return (
-                <TableCell>
-                  {columnKey === 'details' ? (
-                    <Button>
-                      <Link
-                        to="/people/$personId"
-                        params={{
-                          personId: item.id,
-                        }}
-                        className="flex h-full w-full items-center justify-center"
-                        data-testid="more_details_button"
-                      >
-                        See more
-                      </Link>
-                    </Button>
-                  ) : (
-                    renderedValue
-                  )}
-                </TableCell>
-              );
-            }}
+            {(columnKey) => (
+              <TableCell>
+                {item[columnKey as keyof PersonType] ?? 'n/a'}
+              </TableCell>
+            )}
           </TableRow>
         )}
       </TableBody>

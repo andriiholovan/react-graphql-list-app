@@ -13,6 +13,7 @@
     "vite.config.ts",
     "tailwind.config.ts",
     "playwright.config.ts",
-    "tests/**/*.spec.ts"
+    "tests/**/*.spec.ts",
+    "api/**/*.ts"
   ]
 }

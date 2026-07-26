@@ -1,22 +1,19 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { gql } from 'graphql-request';
 import type z from 'zod';
 
+import { gqlClient as client } from './client';
 import { PeopleSchema, PersonSchema } from './schema';
 
-// todo: implement pagination based on graphQL requests
-// const PER_PAGE = 10;
-
-const BASE_URI = 'https://swapi-graphql.eskerda.vercel.app';
-const client = new GraphQLClient(BASE_URI);
-
-export async function fetchAllPeople() {
-  // I'm using zod to validate endpoint response in the runtime
+export async function fetchAllPeople(variables?: {
+  offset?: number;
+  limit?: number;
+}) {
   const data = await client.request<{
     allPeople: z.infer<typeof PeopleSchema>;
   }>(
     gql`
-      query AllPeople {
-        allPeople {
+      query AllPeople($offset: Int = 0, $limit: Int = 10) {
+        allPeople(offset: $offset, limit: $limit) {
           people {
             birthYear
             eyeColor
@@ -27,26 +24,20 @@ export async function fetchAllPeople() {
             gender
             mass
           }
-          pageInfo {
-            endCursor
-            hasNextPage
-            hasPreviousPage
-            startCursor
-          }
           totalCount
         }
       }
     `,
-    // {
-    //   per_page: PER_PAGE,
-    // },
+    {
+      offset: variables?.offset ?? 0,
+      limit: variables?.limit ?? 10,
+    },
   );
   return PeopleSchema.parse(data.allPeople);
 }
 
 export async function fetchPersonByID(personId: string) {
-  // I'm using zod to validate endpoint response in the runtime
-  const { person } = await client.request<{
+  const data = await client.request<{
     person: z.infer<typeof PersonSchema>;
   }>(
     gql`
@@ -67,5 +58,5 @@ export async function fetchPersonByID(personId: string) {
       personId,
     },
   );
-  return PersonSchema.parse(person);
+  return PersonSchema.parse(data.person);
 }

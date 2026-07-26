@@ -12,4 +12,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    port: Number(process.env.VITE_PORT ?? 3001),
+    proxy: {
+      '/api': {
+        target: `http://localhost:${process.env.API_PORT ?? 4000}`,
+      },
+    },
+  },
 });

@@ -1,3 +1,2 @@
-export * from './fetchers';
-export * from './peopleQuery';
+export * from './queries';
 export * from './schema';

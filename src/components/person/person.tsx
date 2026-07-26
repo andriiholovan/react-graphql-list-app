@@ -7,36 +7,43 @@ import {
   TableHeader,
   TableRow,
 } from '@heroui/react';
-import { Link, useParams } from '@tanstack/react-router';
+import { useCanGoBack, useParams, useRouter } from '@tanstack/react-router';
 
-import { usePersonQuery } from '../../hooks/usePersonQuery';
-import { GlobalError } from '../global-error';
-import { PersonLoader } from './person-loader';
+import { usePersonQuery } from '../../hooks/use-person-query';
+import { BackArrowIcon } from '../back-arrow-icon';
+import { PersonSkeleton } from './person-skeleton';
 
 export function Person() {
-  const { personId } = useParams({ from: '/people/$personId' });
+  const { personId } = useParams({ from: '/person/$personId' });
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
   const { data, isLoading, error } = usePersonQuery(personId);
 
-  if (isLoading) return <PersonLoader />;
-  if (error) return <GlobalError error={error} />;
+  if (isLoading) return <PersonSkeleton />;
+  if (error) throw error;
+
+  const handleBack = () => {
+    if (canGoBack) {
+      router.history.back();
+    } else {
+      router.navigate({ to: '/people/$page', params: { page: '1' } });
+    }
+  };
 
   return (
     <div className="px-4 py-4">
-      <Button color="primary">
-        <Link
-          to="/people"
-          className="flex h-full w-full items-center justify-center"
-          data-testid="back_to_people_list_link"
-        >
-          Back
-        </Link>
-      </Button>
+      <Button
+        isIconOnly
+        onPress={handleBack}
+        startContent={<BackArrowIcon />}
+        data-testid="back_to_people_list_link"
+      />
       <div className="h-screen">
         <h2
-          className="mb-2 text-center font-black text-xl"
+          className="mb-6 text-center font-black text-xl"
           data-testid="person_title"
         >
-          Character: {data?.name ?? 'n/a'}
+          <span className="font-normal">Character:</span> {data?.name ?? 'n/a'}
         </h2>
         <Table aria-label="Detailed character information table">
           <TableHeader>

@@ -12,7 +12,7 @@ test('Navigating to a people page', async ({ page }) => {
 test('Navigating to person page', async ({ page }) => {
   await page.getByTestId('home_start_button').click();
 
-  await page.getByTestId('more_details_button').first().click();
+  await page.getByTestId('main_table').getByRole('row').nth(1).click();
   await expect(page.getByTestId('person_title')).toContainText('Character:');
 
   await page.getByTestId('back_to_people_list_link').click();
