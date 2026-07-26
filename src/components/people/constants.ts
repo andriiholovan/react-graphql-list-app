@@ -1,6 +1,6 @@
 export const columns = [
-  { name: 'NAME', uid: 'name', sortable: true },
-  { name: 'BIRTH YEAR', uid: 'birthYear', sortable: true },
+  { name: 'NAME', uid: 'name' },
+  { name: 'BIRTH YEAR', uid: 'birthYear' },
   { name: 'GENDER', uid: 'gender' },
-  { name: 'HEIGHT', uid: 'height', sortable: true },
+  { name: 'HEIGHT', uid: 'height' },
 ];

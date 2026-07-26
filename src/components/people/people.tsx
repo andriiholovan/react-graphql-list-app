@@ -15,7 +15,7 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { type Key, useCallback, useMemo, useState } from 'react';
 
 import type { PersonType } from '../../api';
-import { usePeopleQuery } from '../../hooks';
+import { useDebounce, usePeopleQuery } from '../../hooks';
 import { SearchIcon } from '../search-icon';
 import { columns } from './constants';
 
@@ -27,14 +27,16 @@ export function People() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filterValue, setFilterValue] = useState('');
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: 'name',
+    column: '',
     direction: 'ascending',
   });
+
+  const debouncedFilter = useDebounce(filterValue, 300);
 
   const { data, isFetching } = usePeopleQuery({
     offset: (pageNumber - 1) * rowsPerPage,
     limit: rowsPerPage,
-    filter: filterValue || undefined,
+    filter: debouncedFilter || undefined,
     sortBy: String(sortDescriptor.column),
     sortDirection: sortDescriptor.direction,
   });
@@ -54,18 +56,13 @@ export function People() {
     [goToFirstPage],
   );
 
-  const onSearchChange = useCallback(
-    (value?: string) => {
-      setFilterValue(value || '');
-      goToFirstPage();
-    },
-    [goToFirstPage],
-  );
+  const onSearchChange = useCallback((value?: string) => {
+    setFilterValue(value || '');
+  }, []);
 
   const onSearchClear = useCallback(() => {
     setFilterValue('');
-    goToFirstPage();
-  }, [goToFirstPage]);
+  }, []);
 
   const onSortChange = useCallback(
     (descriptor: SortDescriptor) => {
@@ -183,11 +180,7 @@ export function People() {
     >
       <TableHeader columns={columns}>
         {(column) => (
-          <TableColumn
-            key={column.uid}
-            align="start"
-            allowsSorting={column.sortable}
-          >
+          <TableColumn allowsSorting key={column.uid} align="start">
             {column.name}
           </TableColumn>
         )}
