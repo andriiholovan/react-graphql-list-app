@@ -31,36 +31,16 @@ export function People() {
     direction: 'ascending',
   });
 
-  const offset = (pageNumber - 1) * rowsPerPage;
-
-  const { data, isFetching } = usePeopleQuery(offset, rowsPerPage);
+  const { data, isFetching } = usePeopleQuery({
+    offset: (pageNumber - 1) * rowsPerPage,
+    limit: rowsPerPage,
+    filter: filterValue || undefined,
+    sortBy: String(sortDescriptor.column),
+    sortDirection: sortDescriptor.direction,
+  });
 
   const people = isFetching ? [] : (data?.people ?? []);
   const pages = data ? Math.ceil(data.totalCount / rowsPerPage) : 0;
-
-  const filteredItems = useMemo(() => {
-    if (!filterValue) return people;
-
-    return people.filter((user) =>
-      user.name.toLowerCase().includes(filterValue.toLowerCase()),
-    );
-  }, [people, filterValue]);
-
-  const sortedItems = useMemo(
-    () =>
-      filteredItems.toSorted((a, b) => {
-        const first = a[sortDescriptor.column as keyof PersonType];
-        const second = b[sortDescriptor.column as keyof PersonType];
-
-        if (first === null || first === undefined) return 1;
-        if (second === null || second === undefined) return -1;
-
-        const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-        return sortDescriptor.direction === 'descending' ? -cmp : cmp;
-      }),
-    [sortDescriptor, filteredItems],
-  );
 
   const goToFirstPage = useCallback(() => {
     navigate({ to: '/people/$page', params: { page: '1' } });
@@ -87,6 +67,14 @@ export function People() {
     goToFirstPage();
   }, [goToFirstPage]);
 
+  const onSortChange = useCallback(
+    (descriptor: SortDescriptor) => {
+      setSortDescriptor(descriptor);
+      goToFirstPage();
+    },
+    [goToFirstPage],
+  );
+
   const handlePageChange = useCallback(
     (newPage: number) => {
       navigate({ to: '/people/$page', params: { page: String(newPage) } });
@@ -94,17 +82,21 @@ export function People() {
     [navigate],
   );
 
-  const onRowAction = (key: Key) =>
-    navigate({
-      to: '/person/$personId',
-      params: { personId: key as string },
-    });
+  const onRowAction = useCallback(
+    (key: Key) =>
+      navigate({
+        to: '/person/$personId',
+        params: { personId: key as string },
+      }),
+    [navigate],
+  );
 
   const topContent = useMemo(
     () => (
       <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
           <Input
+            data-testid="search_input"
             isClearable
             className="w-full"
             placeholder="Search by name..."
@@ -158,12 +150,12 @@ export function People() {
           page={pageNumber}
           total={pages}
           onChange={handlePageChange}
-          showShadow={!!filteredItems.length}
-          showControls={!!filteredItems.length}
+          showShadow={Boolean(people.length)}
+          showControls={Boolean(people.length)}
         />
       </div>
     ),
-    [pageNumber, pages, filteredItems.length, handlePageChange],
+    [pageNumber, pages, people.length, handlePageChange],
   );
 
   return (
@@ -178,13 +170,13 @@ export function People() {
         base: 'h-dvh px-4 py-4',
         wrapper: 'h-full min-h-96',
         table: cn(
-          sortedItems.length >= rowsPerPage && !isFetching && 'h-full',
+          people.length >= rowsPerPage && !isFetching && 'h-full',
           '[border-collapse:separate] [border-spacing:0_4px]',
         ),
         tr: 'cursor-pointer',
       }}
       onRowAction={onRowAction}
-      onSortChange={setSortDescriptor}
+      onSortChange={onSortChange}
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"
@@ -201,7 +193,7 @@ export function People() {
         )}
       </TableHeader>
       <TableBody
-        items={sortedItems}
+        items={people}
         isLoading={isFetching}
         emptyContent="No people found"
         loadingContent={<Spinner label="Loading..." />}

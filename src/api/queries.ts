@@ -7,13 +7,28 @@ import { PeopleSchema, PersonSchema } from './schema';
 export async function fetchAllPeople(variables?: {
   offset?: number;
   limit?: number;
+  filter?: string;
+  sortBy?: string;
+  sortDirection?: string;
 }) {
   const data = await client.request<{
     allPeople: z.infer<typeof PeopleSchema>;
   }>(
     gql`
-      query AllPeople($offset: Int = 0, $limit: Int = 10) {
-        allPeople(offset: $offset, limit: $limit) {
+      query AllPeople(
+        $offset: Int = 0
+        $limit: Int = 10
+        $filter: String
+        $sortBy: String
+        $sortDirection: String
+      ) {
+        allPeople(
+          offset: $offset
+          limit: $limit
+          filter: $filter
+          sortBy: $sortBy
+          sortDirection: $sortDirection
+        ) {
           people {
             birthYear
             eyeColor
@@ -31,6 +46,9 @@ export async function fetchAllPeople(variables?: {
     {
       offset: variables?.offset ?? 0,
       limit: variables?.limit ?? 10,
+      filter: variables?.filter,
+      sortBy: variables?.sortBy,
+      sortDirection: variables?.sortDirection,
     },
   );
   return PeopleSchema.parse(data.allPeople);

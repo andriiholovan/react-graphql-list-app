@@ -1,10 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchAllPeople } from '../api';
 
-export function usePeopleQuery(offset: number, limit: number) {
+type UsePeopleQueryOptions = {
+  offset?: number;
+  limit?: number;
+  filter?: string;
+  sortBy?: string;
+  sortDirection?: string;
+};
+
+export function usePeopleQuery(options: UsePeopleQueryOptions = {}) {
+  const { offset = 0, limit = 10, ...rest } = options;
+
   return useQuery({
-    queryKey: ['allPeople', { offset, limit }],
-    queryFn: () => fetchAllPeople({ offset, limit }),
+    queryKey: ['allPeople', { offset, limit, ...rest }],
+    queryFn: () => fetchAllPeople({ offset, limit, ...rest }),
     placeholderData: (prev) => prev,
   });
 }

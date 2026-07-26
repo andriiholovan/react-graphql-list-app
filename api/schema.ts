@@ -46,7 +46,7 @@ const typeDefs = /* GraphQL */ `
   }
 
   type Query {
-    allPeople(offset: Int = 0, limit: Int = 10): PeopleConnection!
+    allPeople(offset: Int = 0, limit: Int = 10, filter: String, sortBy: String, sortDirection: String): PeopleConnection!
     person(id: ID!): Person
   }
 `;
@@ -55,7 +55,19 @@ const resolvers = {
   Query: {
     allPeople: async (
       _: unknown,
-      { offset = 0, limit = 10 }: { offset?: number; limit?: number },
+      {
+        offset = 0,
+        limit = 10,
+        filter,
+        sortBy,
+        sortDirection,
+      }: {
+        offset?: number;
+        limit?: number;
+        filter?: string;
+        sortBy?: string;
+        sortDirection?: string;
+      },
     ) => {
       const res = await fetch(`${SWAPI_REST_BASE}/people/`);
       if (!res.ok) {
@@ -63,16 +75,43 @@ const resolvers = {
       }
       const people: SwapiRestPerson[] = await res.json();
 
-      const mapped = people.map((p) => ({
-        id: extractId(p.url),
-        name: p.name,
-        birthYear: p.birth_year,
-        eyeColor: p.eye_color,
-        hairColor: p.hair_color,
-        height: parseNumber(p.height),
-        mass: parseNumber(p.mass),
-        gender: p.gender,
+      let mapped = people.map((person) => ({
+        id: extractId(person.url),
+        name: person.name,
+        birthYear: person.birth_year,
+        eyeColor: person.eye_color,
+        hairColor: person.hair_color,
+        height: parseNumber(person.height),
+        mass: parseNumber(person.mass),
+        gender: person.gender,
       }));
+
+      if (filter) {
+        const normalizedFilter = filter.toLowerCase();
+        mapped = mapped.filter((person) =>
+          person.name.toLowerCase().includes(normalizedFilter),
+        );
+      }
+
+      if (sortBy) {
+        const direction = sortDirection === 'descending' ? -1 : 1;
+        mapped = mapped.toSorted((left, right) => {
+          const leftValue = left[sortBy as keyof typeof left];
+          const rightValue = right[sortBy as keyof typeof right];
+
+          if (leftValue === null || leftValue === undefined) return 1;
+          if (rightValue === null || rightValue === undefined) return -1;
+
+          if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+            return (leftValue - rightValue) * direction;
+          }
+
+          const comparison = String(leftValue).localeCompare(
+            String(rightValue),
+          );
+          return comparison * direction;
+        });
+      }
 
       const total = mapped.length;
       const start = Math.max(0, Math.min(offset, total));
