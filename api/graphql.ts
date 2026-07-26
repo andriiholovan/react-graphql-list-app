@@ -1,7 +1,7 @@
 import { createYoga } from 'graphql-yoga';
-import { schema } from './schema';
+import { schema } from './schema.js';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
 export default createYoga({
   schema,

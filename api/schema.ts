@@ -5,6 +5,20 @@ import { createSchema } from 'graphql-yoga';
 // - Actively maintained, open-source (https://github.com/Juriy/swapi)
 const SWAPI_REST_BASE = process.env.SWAPI_REST_BASE ?? 'https://swapi.info/api';
 
+let cachedPeoplePromise: Promise<SwapiRestPerson[]> | null = null;
+
+async function getAllPeople() {
+  if (!cachedPeoplePromise) {
+    cachedPeoplePromise = fetch(`${SWAPI_REST_BASE}/people/`).then((res) => {
+      if (!res.ok) {
+        throw new Error(`${SWAPI_REST_BASE} responded with ${res.status}`);
+      }
+      return res.json() as Promise<SwapiRestPerson[]>;
+    });
+  }
+  return cachedPeoplePromise;
+}
+
 interface SwapiRestPerson {
   name: string;
   height: string;
@@ -69,12 +83,7 @@ const resolvers = {
         sortDirection?: string;
       },
     ) => {
-      const res = await fetch(`${SWAPI_REST_BASE}/people/`);
-      if (!res.ok) {
-        throw new Error(`${SWAPI_REST_BASE} responded with ${res.status}`);
-      }
-      const people: SwapiRestPerson[] = await res.json();
-
+      const people = await getAllPeople();
       let mapped = people.map((person) => ({
         id: extractId(person.url),
         name: person.name,
